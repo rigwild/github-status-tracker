@@ -1,0 +1,20 @@
+{
+  "name": "github-status-tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rigwild/github-status-tracker.git"
+  },
+  "author": "rigwild",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rigwild/github-status-tracker/issues"
+  },
+  "homepage": "https://github.com/rigwild/github-status-tracker#readme",
+  "dependencies": {}
+}
