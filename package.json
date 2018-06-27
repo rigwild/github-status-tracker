@@ -16,5 +16,7 @@
     "url": "https://github.com/rigwild/github-status-tracker/issues"
   },
   "homepage": "https://github.com/rigwild/github-status-tracker#readme",
-  "dependencies": {}
+  "dependencies": {
+    "dotenv": "^6.0.0"
+  }
 }
