@@ -12,11 +12,4 @@ const startServer = () => {
   console.log("Server is listening on 127.0.0.1:8080");
 };
 
-/*
-scrapper.fetchStatusPage("2010-06-12")
-  .then(res => console.log(scrapper.parseStatusPage(res)))
-  .catch(err => console.log(err));
-*/
-
-const temp = [ { date: '2010-06-12', events: { good: 1, minor: 0, major: 0 } }];
-scrapper.saveData(temp)
+scrapper.updateStatusData();
