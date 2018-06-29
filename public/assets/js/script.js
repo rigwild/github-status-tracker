@@ -9,13 +9,15 @@ const colors = {
 };
 
 let showGoodEvent = false;
+
+let graphType = 'bar';
 let timeFormat = 'YYYY-MM-DD';
 let tooltipFormat = 'll';
-let generatedChart;
+
 let dataContainer;
 
-const config = {
-  type: 'bar',
+let config = {
+  type: graphType,
   data: {
     labels: [],
     datasets: [{
@@ -110,35 +112,44 @@ const addStatus = async (chartEle, statusArray, groupType) => {
       data = groupByYear(statusArray);
       timeFormat = "YYYY";
       tooltipFormat = "YYYY";
+      graphType = "bar";
       break;
     case "month":
       data = groupByMonth(statusArray);
       timeFormat = "YYYY-MM";
       tooltipFormat = "MMM YYYY";
+      graphType = "bar";
       break;
     case "day":
     default:
       timeFormat = "YYYY-MM-DD";
       tooltipFormat = "ll";
+      graphType = "bar";
       break;
   }
 
+  //Get the checkbox state
+  showGoodEvent = document.getElementById("goodCheckbox").checked;
   //Set the visuals to the appropriate format
-  chartEle.options.scales.xAxes.parser = timeFormat;
-  chartEle.options.scales.xAxes.tooltipFormat = tooltipFormat;
+  config.data.datasets[0].hidden = !showGoodEvent; //show/hide good events colum
+  config.type = graphType;
+  config.options.scales.xAxes[0].time.parser = timeFormat;
+  config.options.scales.xAxes[0].time.tooltipFormat = tooltipFormat;
+
+  //Empty the graph
+  chartEle.data.labels = [];
+  chartEle.data.datasets.forEach(dataset => dataset.data = []);
 
   if (groupType === "day")
     statusArray.forEach(status => {
-      //Check if day is not already present
-      if (!chartEle.data.labels.find(aSavedDay => aSavedDay === status.date)) {
-        //Add the date and its related data
-        chartEle.data.labels.push(status.date);
-        if (showGoodEvent) chartEle.data.datasets[0].data.push(status.events.good);
-        chartEle.data.datasets[1].data.push(status.events.minor);
-        chartEle.data.datasets[2].data.push(status.events.major);
-      }
+      //Add the date and its related data
+      chartEle.data.labels.push(status.date);
+      chartEle.data.datasets[0].data.push(status.events.good);
+      chartEle.data.datasets[1].data.push(status.events.minor);
+      chartEle.data.datasets[2].data.push(status.events.major);
     });
-  else
+  else {
+    //Add the new data
     for (let group in data) {
       chartEle.data.labels.push(group);
       //Count the number of each event in the group
@@ -152,26 +163,45 @@ const addStatus = async (chartEle, statusArray, groupType) => {
         events.minor += status.events.minor;
         events.major += status.events.major;
       })
-      if (showGoodEvent) chartEle.data.datasets[0].data.push(events.good);
+      chartEle.data.datasets[0].data.push(events.good);
       chartEle.data.datasets[1].data.push(events.minor);
       chartEle.data.datasets[2].data.push(events.major);
     }
-
+  }
   //Update the graph to show the result
-  chartEle.update();
+  chartEle.update(config);
 }
 
 
-window.onload = async () => {
-  generatedChart = new Chart(
+//Load the data from the server, groupmethod = day/month/year
+const loadData = (chartEle, groupMethod) => {
+  if (!dataContainer) {
+    fetch("/getData")
+      .then(res => res.json())
+      .then(data => {
+        dataContainer = data;
+        return addStatus(chartEle, data, groupMethod);
+      })
+      .catch(err => console.error(err));
+  } else
+    addStatus(chartEle, dataContainer, groupMethod);
+}
+
+//Set button events
+const setButtonsEvent = chartEle =>
+  ["day", "month", "year"].forEach(button =>
+    document.getElementById(button).addEventListener('click', () => loadData(chartEle, button)))
+
+//Create a chart with a config
+const createChart = config =>
+  new Chart(
     document.getElementById('line-chart').getContext('2d'),
     config
   );
-  fetch("/getData")
-    .then(res => res.json())
-    .then(data => {
-      dataContainer = data;
-      return addStatus(generatedChart, data, "month");
-    })
-    .catch(err => console.error(err));
+
+//Start the script
+window.onload = () => {
+  chartEle = createChart(config);
+  loadData(chartEle, "month");
+  setButtonsEvent(chartEle);
 };

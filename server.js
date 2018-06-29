@@ -1,13 +1,12 @@
 const fs = require('fs');
 const scrapper = require('./scrapper.js');
-const express = require('express')
-const app = express()
+const express = require('express');
+const app = express();
 
 app.use(express.static(__dirname + '/public'));
 
 app.get('/', (req, res) => {
   res.render('index.html');
-
 });
 
 app.get('/getData', (req, res) => {
@@ -21,5 +20,3 @@ app.get('/getData', (req, res) => {
 });
 
 app.listen(8080, () => console.log('Server is listening on port 8080.'));
-
-// scrapper.updateStatusData();

@@ -2,10 +2,20 @@
 <html lang="en">
 <head>
   <title>Github Status Tracker</title>
+  <link rel="stylesheet" type="text/css" href="./assets/css/style.css">
 </head>
 <body>
-  <div style="width: 90%;height: 100%;padding: 0px 50px 0px 50px;">
+  <div class="center graphDiv">
     <canvas id="line-chart"></canvas>
+  </div>
+
+  <div class="center width100">
+  	<button id="day">Group by day</button>
+  	<button id="month">Group by month</button>
+  	<button id="year">Group by year</button>
+
+  	<input type="checkbox" id="goodCheckbox">
+  	<label for="goodCheckbox">Show good events</label>
   </div>
   <script type="text/javascript" src="./assets/js/moment.min.js"></script>
   <script type="text/javascript" src="./assets/js/Chart.min.js"></script>
