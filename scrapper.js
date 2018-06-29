@@ -13,6 +13,8 @@ const regexList = {
   getNextWeekDate: /\"\/messages\/(.*?)\".*?Next Week/
 };
 
+const firstStatusDate = '{"date":"2010-02-01","events":{"good":1,"minor":0,"major":0}}';
+
 //Load the data contained in the save file
 const getSavedData = async () => {
   try {
@@ -108,7 +110,7 @@ const getStatusOnline = async date => {
 //Get or update the status data from github
 const updateStatusData = async () => {
   if (!fs.existsSync(dataFile))
-    fs.writeFileSync(dataFile, '[{"date":"2010-06-06","events":{"good":1,"minor":0,"major":0}}]');
+    fs.writeFileSync(dataFile, `[${firstStatusDate}]`);
 
   //We get the last status date saved in the file
   let savedData = await getSavedData();
@@ -166,7 +168,7 @@ Array.prototype.sortByKey = function(key) {
 //It searches if the date of the event in the save file exists, if not, it adds it to the save file
 const saveData = async daysEventsArray => {
   if (!fs.existsSync(dataFile))
-    fs.writeFileSync(dataFile, '{"date":"2010-06-06","events":{"good":1,"minor":0,"major":0}}');
+    fs.writeFileSync(dataFile, `[${firstStatusDate}]`);
 
   let savedData = await getSavedData();
   if (!savedData) return false;
