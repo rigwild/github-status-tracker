@@ -1,15 +1,25 @@
-const http = require('http');
+const fs = require('fs');
 const scrapper = require('./scrapper.js');
+const express = require('express')
+const app = express()
 
-const startServer = () => {
-  http.createServer(function(req, res) {
-    res.writeHead(200, {
-      'Content-Type': 'text/html'
-    });
-    res.write('Hello World!');
-    res.end();
-  }).listen(8080);
-  console.log("Server is listening on 127.0.0.1:8080");
-};
+app.use(express.static(__dirname + '/public'));
 
-scrapper.updateStatusData();
+app.get('/', (req, res) => {
+  res.render('index.html');
+
+});
+
+app.get('/getData', (req, res) => {
+  try {
+    let pageContent = fs.readFileSync('./data.json', 'utf8');
+    pageContent = JSON.parse(pageContent);
+    res.json(pageContent);
+  } catch (e) {
+    console.error(e);
+  }
+});
+
+app.listen(8080, () => console.log('Server is listening on port 8080.'));
+
+// scrapper.updateStatusData();

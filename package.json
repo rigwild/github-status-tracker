@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/rigwild/github-status-tracker#readme",
   "dependencies": {
-    "dotenv": "^6.0.0"
+    "dotenv": "^6.0.0",
+    "express": "^4.16.3"
   }
 }
