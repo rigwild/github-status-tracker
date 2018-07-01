@@ -1,12 +1,6 @@
 * {
   font-family: "Arial", sans-serif;
 }
-.graphDiv {
-  width: 90%;
-  height: 100%;
-  padding: 0px 50px 0px 50px;
-  margin: 0 auto;
-}
 
 .center {
   text-align: center;
@@ -14,4 +8,7 @@
 
 .width100 {
   width: 100%;
+}
+.main {
+  padding: 20px 20px 0px 20px;
 }

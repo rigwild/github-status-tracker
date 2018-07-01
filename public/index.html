@@ -2,19 +2,43 @@
 <html lang="en">
 <head>
   <title>Github Status Tracker</title>
-  <link rel="stylesheet" type="text/css" href="./assets/css/style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <link rel="icon" href="./assets/img/favicon.png" type="image/png" />
+
+  <link rel="stylesheet" type="text/css" href="./assets/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="./assets/css/fontawesome-all.min.css" />
+  <link rel="stylesheet" type="text/css" href="./assets/css/style.css" />
 </head>
 <body>
-  <div class="center graphDiv">
-    <canvas id="line-chart"></canvas>
+  <div class="container-fluid main">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card text-center">
+          <div class="card-header">
+            Github Status Tracker
+          </div>
+          <div class="card-body">
+            <canvas id="line-chart"></canvas>
+          </div>
+          <div class="card-footer">
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-secondary" id="day">Group by day</button>
+              <button type="button" class="btn btn-secondary" id="month">Group by month</button>
+              <button type="button" class="btn btn-secondary" id="year">Group by year</button>
+            </div>
+
+            <button type="button" class="btn btn-primary" id="updateData">Update graph data</button>
+          </div>
+        </div>
+        
+      </div>
+    </div>
   </div>
 
-  <div class="center width100">
-    <button id="day">Group by day</button>
-    <button id="month">Group by month</button>
-    <button id="year">Group by year</button>
-
-    <button id="updateData">Update the data</button>
+  <div class="text-center pt-2 pb-2">
+    <a href="https://github.com/rigwild/github-status-tracker" class="text-muted" target="_blank">Available on GitHub</a>
+    <img src="./assets/img/GitHub-Mark-32px.png" alt="GitHub logo" width="20px" />
   </div>
   
   <script type="text/javascript" src="./assets/js/moment.min.js"></script>

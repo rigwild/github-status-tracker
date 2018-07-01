@@ -1,3 +1,5 @@
+'use strict';
+
 const colors = {
   red: 'rgb(255, 99, 132)',
   orange: 'rgb(255, 159, 64)',
@@ -41,7 +43,7 @@ let config = {
   options: {
     responsive: true,
     title: {
-      display: true,
+      display: false,
       text: 'GitHub Status Tracker'
     },
     tooltips: {
@@ -165,7 +167,7 @@ const addStatus = async (chartEle, statusArray, groupType) => {
   }
   //Update the graph to show the result
   chartEle.update(config);
-}
+};
 
 
 //Load the data from the server, groupmethod = day/month/year
@@ -180,35 +182,41 @@ const loadData = (chartEle, groupMethod) => {
       .catch(err => console.error(err));
   } else
     addStatus(chartEle, dataContainer, groupMethod);
-}
+};
 
 const updateData = (chartEle, groupMethod) => {
+  buttonAnimation(document.getElementById("updateData"), "Updating graph data ...", true)
   fetch("/updateData")
     .then(res => res.json())
     .then(data => {
       dataContainer = data;
+      buttonAnimation(document.getElementById("updateData"), "Update graph data", false);
       return addStatus(chartEle, data, groupMethod);
     })
     .catch(err => console.error(err));
-}
+};
 
 //Set button events
 const setButtonsEvent = chartEle => {
   ["day", "month", "year"].forEach(button =>
     document.getElementById(button).addEventListener('click', () => loadData(chartEle, button)));
   document.getElementById("updateData").addEventListener('click', () => updateData(chartEle, "month"));
-}
+};
 
-//Create a chart with a config
-const createChart = config =>
-  new Chart(
-    document.getElementById('line-chart').getContext('2d'),
-    config
-  );
+//Remove html chars from string
+const stripHtml = str => str.replace(/[\u00A0-\u9999<>\&]/gim, i => '&#' + i.charCodeAt(0) + ';');
+
+//Set button animation, true to animate, false to reset
+const buttonAnimation = (ele, text, animationBool) =>
+  ele.innerHTML = `${stripHtml(text)}${animationBool ? " <i class='fas fa-spinner fa-spin'></i>" : ""}`;
+
 
 //Start the script
 window.onload = () => {
-  chartEle = createChart(config);
+  const chartEle = new Chart(
+    document.getElementById('line-chart').getContext('2d'),
+    config
+  );
   loadData(chartEle, "month");
   setButtonsEvent(chartEle);
 };

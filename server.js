@@ -1,3 +1,5 @@
+'use strict';
+
 const fs = require('fs');
 const scrapper = require('./scrapper.js');
 const express = require('express');
