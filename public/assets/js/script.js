@@ -8,8 +8,6 @@ const colors = {
   grey: 'rgb(231,233,237)'
 };
 
-let showGoodEvent = false;
-
 let graphType = 'bar';
 let timeFormat = 'YYYY-MM-DD';
 let tooltipFormat = 'll';
@@ -128,10 +126,7 @@ const addStatus = async (chartEle, statusArray, groupType) => {
       break;
   }
 
-  //Get the checkbox state
-  showGoodEvent = document.getElementById("goodCheckbox").checked;
   //Set the visuals to the appropriate format
-  config.data.datasets[0].hidden = !showGoodEvent; //show/hide good events colum
   config.type = graphType;
   config.options.scales.xAxes[0].time.parser = timeFormat;
   config.options.scales.xAxes[0].time.tooltipFormat = tooltipFormat;
@@ -144,28 +139,28 @@ const addStatus = async (chartEle, statusArray, groupType) => {
     statusArray.forEach(status => {
       //Add the date and its related data
       chartEle.data.labels.push(status.date);
-      chartEle.data.datasets[0].data.push(status.events.good);
-      chartEle.data.datasets[1].data.push(status.events.minor);
-      chartEle.data.datasets[2].data.push(status.events.major);
+      chartEle.data.datasets[0].data.push(status.eventsCount.good);
+      chartEle.data.datasets[1].data.push(status.eventsCount.minor);
+      chartEle.data.datasets[2].data.push(status.eventsCount.major);
     });
   else {
     //Add the new data
     for (let group in data) {
       chartEle.data.labels.push(group);
       //Count the number of each event in the group
-      let events = {
+      let eventsCount = {
         good: 0,
         minor: 0,
         major: 0
       };
       data[group].forEach(status => {
-        events.good += status.events.good;
-        events.minor += status.events.minor;
-        events.major += status.events.major;
+        eventsCount.good += status.eventsCount.good;
+        eventsCount.minor += status.eventsCount.minor;
+        eventsCount.major += status.eventsCount.major;
       })
-      chartEle.data.datasets[0].data.push(events.good);
-      chartEle.data.datasets[1].data.push(events.minor);
-      chartEle.data.datasets[2].data.push(events.major);
+      chartEle.data.datasets[0].data.push(eventsCount.good);
+      chartEle.data.datasets[1].data.push(eventsCount.minor);
+      chartEle.data.datasets[2].data.push(eventsCount.major);
     }
   }
   //Update the graph to show the result
@@ -187,10 +182,22 @@ const loadData = (chartEle, groupMethod) => {
     addStatus(chartEle, dataContainer, groupMethod);
 }
 
+const updateData = (chartEle, groupMethod) => {
+  fetch("/updateData")
+    .then(res => res.json())
+    .then(data => {
+      dataContainer = data;
+      return addStatus(chartEle, data, groupMethod);
+    })
+    .catch(err => console.error(err));
+}
+
 //Set button events
-const setButtonsEvent = chartEle =>
+const setButtonsEvent = chartEle => {
   ["day", "month", "year"].forEach(button =>
-    document.getElementById(button).addEventListener('click', () => loadData(chartEle, button)))
+    document.getElementById(button).addEventListener('click', () => loadData(chartEle, button)));
+  document.getElementById("updateData").addEventListener('click', () => updateData(chartEle, "month"));
+}
 
 //Create a chart with a config
 const createChart = config =>

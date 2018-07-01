@@ -19,4 +19,18 @@ app.get('/getData', (req, res) => {
   }
 });
 
+app.get('/updateData', (req, res) => {
+  scrapper.updateStatusData()
+    .then(() => {
+      try {
+        let pageContent = fs.readFileSync('./data.json', 'utf8');
+        pageContent = JSON.parse(pageContent);
+        res.json(pageContent);
+      } catch (e) {
+        console.error(e);
+      }
+    })
+    .catch(err => console.error(err));
+});
+
 app.listen(8080, () => console.log('Server is listening on port 8080.'));

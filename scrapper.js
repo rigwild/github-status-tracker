@@ -6,14 +6,20 @@ const fs = require('fs');
 const dataFile = process.env.DATA_FILE_PATH;
 
 const regexList = {
-  getDayGroups: /message_group\" id=\"(.*?)\"\>[\s\S]*?(?=message_group|pagination)/g,
+  getDayGroups: /message_group\" id=\".*?\"\>[\s\S]*?(?=message_group|pagination)/g,
   getDayDate: /id=\"(.*?)\"/,
-  getEventTypes: /message (?:auto-message)*(.*?)\"/g,
+  getEventTypes: /message (?:auto-message)*(.*?)\"[\s\S]*?datetime=\"(.*?)\"[\s\S]*?title\"\>(.*?)\<\/span/g,
   isWeekTheMostRecent: /next disabled/,
   getNextWeekDate: /\"\/messages\/(.*?)\".*?Next Week/
 };
 
-const firstStatusDate = '{"date":"2010-02-01","events":{"good":1,"minor":0,"major":0}}';
+const firstStatusDate =
+  '{"date": "2010-02-01", "eventsCount": {"good": 1, "minor": 0, "major": 0}, "events": []}';
+
+const checkDataFileExists = () => {
+  if (!fs.existsSync(dataFile))
+    fs.writeFileSync(dataFile, `[${firstStatusDate}]`);
+};
 
 //Load the data contained in the save file
 const getSavedData = async () => {
@@ -65,31 +71,37 @@ const parseStatusPage = html => {
 
     let dayResult = {
       date: dayDate,
-      events: {
+      eventsCount: {
         good: 0,
         minor: 0,
         major: 0
-      }
+      },
+      events: []
     };
-    //get the events type
+    //get the events type and status message
     while ((temp = regexList.getEventTypes.exec(day)))
-      eventsType.push(temp[1].trim());
+      eventsType.push({
+        type: temp[1].trim(),
+        timestamp: temp[2].trim(),
+        msg: temp[3].trim()
+      });
 
-    //Increment the count of the corresponding event type
+    //Increment the count of the corresponding event type and add the event
     eventsType.forEach(aEventType => {
-      switch (aEventType) {
+      switch (aEventType.type) {
         case "good":
-          dayResult.events.good++;
+          dayResult.eventsCount.good++;
           break;
         case "minor":
-          dayResult.events.minor++;
+          dayResult.eventsCount.minor++;
           break;
         case "major":
-          dayResult.events.major++;
+          dayResult.eventsCount.major++;
           break;
         default:
           break;
       }
+      dayResult.events.push(aEventType);
     });
     result.push(dayResult);
   });
@@ -108,48 +120,49 @@ const getStatusOnline = async date => {
 };
 
 //Get or update the status data from github
-const updateStatusData = async () => {
-  if (!fs.existsSync(dataFile))
-    fs.writeFileSync(dataFile, `[${firstStatusDate}]`);
+const updateStatusData = () =>
+  new Promise(async resolve => {
+    await checkDataFileExists(dataFile);
 
-  //We get the last status date saved in the file
-  let savedData = await getSavedData();
-  if (!savedData) return;
-  savedData.sortByKey("date");
-  let date = savedData[savedData.length - 1].date;
+    //We get the last status date saved in the file
+    let savedData = await getSavedData();
+    if (!savedData) return;
+    savedData.sortByKey("date");
+    let date = savedData[savedData.length - 1].date;
 
-  console.log(`Updating the GitHub status events data ...\n`);
-  //We loop from the last saved date to the most recent online, stop if last status or error
-  let continueFetching = true;
-  let count = 0;
-  while (continueFetching) {
-    try {
-      console.log(`Fetching GitHub status for the week of this date : ${date}.`);
-      const html = await fetchStatusPage(date);
-      const weekStatus = await parseStatusPage(html);
-      saveData(weekStatus);
-      if (!regexList.isWeekTheMostRecent.test(html))
-        date = html.match(regexList.getNextWeekDate)[1];
-      else {
-        console.log(`The date : ${date} is the most recent GitHub status's update week.`);
+    console.log(`Updating the GitHub status events data ...\n`);
+    //We loop from the last saved date to the most recent online, stop if last status or error
+    let continueFetching = true;
+    let count = 0;
+    while (continueFetching) {
+      try {
+        console.log(`Fetching GitHub status for the week of this date : ${date}.`);
+        const html = await fetchStatusPage(date);
+        const weekStatus = await parseStatusPage(html);
+        saveData(weekStatus);
+        if (!regexList.isWeekTheMostRecent.test(html))
+          date = html.match(regexList.getNextWeekDate)[1];
+        else {
+          console.log(`The date : ${date} is the most recent GitHub status's update week.`);
+          continueFetching = false;
+        }
+      } catch (e) {
+        //If the page redirects (http 302 code), we are at the last week of GitHub status
+        if (e.hasOwnProperty('statusCode') && e.statusCode === 302) {
+          //Save the last week status
+          await saveData(await parseStatusPage(await fetchStatusPage()));
+          console.log(`The date : ${date} is the most recent GitHub status's update week.`);
+        } else {
+          console.error(e);
+          count--;
+        };
         continueFetching = false;
       }
-    } catch (e) {
-      //If the page redirects (http 302 code), we are at the last week of GitHub status
-      if (e.hasOwnProperty('statusCode') && e.statusCode === 302) {
-        //Save the last week status
-        await saveData(await parseStatusPage(await fetchStatusPage()));
-        console.log(`The date : ${date} is the most recent GitHub status's update week.`);
-      } else {
-        console.error(e);
-        count--;
-      };
-      continueFetching = false;
+      count++;
     }
-    count++;
-  }
-  console.log(`\nSuccessfully updated GitHub status events data. ${count} week(s) of events were fetched.`);
-};
+    console.log(`\nSuccessfully updated GitHub status events data. ${count} week(s) of events were fetched.`);
+    resolve();
+  });
 
 //Sort any array of objects by one of its keys
 Array.prototype.sortByKey = function(key) {
@@ -167,8 +180,7 @@ Array.prototype.sortByKey = function(key) {
 //Pass an array of objects containing the date and the count of each type of events in parameters
 //It searches if the date of the event in the save file exists, if not, it adds it to the save file
 const saveData = async daysEventsArray => {
-  if (!fs.existsSync(dataFile))
-    fs.writeFileSync(dataFile, `[${firstStatusDate}]`);
+  await checkDataFileExists(dataFile);
 
   let savedData = await getSavedData();
   if (!savedData) return false;
