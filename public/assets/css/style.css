@@ -2,13 +2,21 @@
   font-family: "Arial", sans-serif;
 }
 
-.center {
-  text-align: center;
-}
-
 .width100 {
-  width: 100%;
+  width: 100% !important;
 }
 .main {
   padding: 20px 20px 0px 20px;
+}
+#eventsTableDiv {
+  display: none;
+}
+.table-responsive {
+   overflow-x: inherit;
+}
+ul.pagination {
+  justify-content: center !important;
+}
+table.dataTable {
+  border-collapse: collapse !important;
 }

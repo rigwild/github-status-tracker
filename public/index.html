@@ -8,10 +8,11 @@
 
   <link rel="stylesheet" type="text/css" href="./assets/css/bootstrap.min.css" />
   <link rel="stylesheet" type="text/css" href="./assets/css/fontawesome-all.min.css" />
+  <link rel="stylesheet" type="text/css" href="./assets/css/datatables.min.css" />
   <link rel="stylesheet" type="text/css" href="./assets/css/style.css" />
 </head>
 <body>
-  <div class="container-fluid main">
+  <div class="container-fluid p-3">
     <div class="row">
       <div class="col-md-12">
         <div class="card text-center">
@@ -30,6 +31,19 @@
 
             <button type="button" class="btn btn-primary" id="updateData">Update graph data</button>
           </div>
+          <div class="card-body table-responsive" id="eventsTableDiv">
+            <table class="table table-sm data-table table-hover table-striped width100" id="eventsTable">
+              <thead>
+                <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col">Event type</th>
+                  <th scope="col">Message</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
         </div>
         
       </div>
@@ -41,6 +55,8 @@
     <img src="./assets/img/GitHub-Mark-32px.png" alt="GitHub logo" width="20px" />
   </div>
   
+  <script type="text/javascript" src="./assets/js/jquery-3.3.1.min.js"></script>
+  <script type="text/javascript" src="./assets/js/datatables.min.js"></script>
   <script type="text/javascript" src="./assets/js/moment.min.js"></script>
   <script type="text/javascript" src="./assets/js/Chart.min.js"></script>
   <script type="text/javascript" src="./assets/js/script.js"></script>

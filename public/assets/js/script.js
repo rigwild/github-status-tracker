@@ -14,9 +14,43 @@ let graphType = 'bar';
 let timeFormat = 'YYYY-MM-DD';
 let tooltipFormat = 'll';
 
+let chartEle;
+let dataTable;
 let dataContainer;
 
-let config = {
+//Show/hide the table
+const tableVisible = visibleBool =>
+  document.getElementById("eventsTableDiv").style.display = visibleBool ? "block" : "none";
+
+//Add lines to a dataTable
+const addTableLines = (dataTable, dataArray) => dataTable.rows.add(dataArray).draw();
+
+//Remove all the lines from a table
+const clearTable = dataTable => dataTable.clear();
+
+//Called on click on a chart bar, add table lines with the events corresponding to the bar clicked
+const updateTable = (event, array) => {
+  if (array.length === 0) return;
+  //Get which bar was clicked
+  const clickedBar = array[0]._index;
+  const clickedDataGroup = chartEle.data.labels[clickedBar];
+  //Get the data corresponding with the bar
+  const correspondingData = [];
+  console.log("avant")
+  dataContainer.forEach(day => day.date.includes(clickedDataGroup) && correspondingData.push(day));
+  clearTable(dataTable); //Empty the table
+  //Add the lines to the table
+  correspondingData.forEach(day => {
+    const newLines = [];
+    day.events.forEach(event => newLines.push([event.timestamp, event.type, event.msg]));
+    addTableLines(dataTable, newLines);
+  });
+  console.log("apres")
+  tableVisible(true);
+};
+
+//Chart.js config
+let chartConfig = {
   type: graphType,
   data: {
     labels: [],
@@ -54,6 +88,7 @@ let config = {
       mode: 'nearest',
       intersect: true
     },
+    onClick: updateTable,
     scales: {
       xAxes: [{
         type: 'time',
@@ -85,6 +120,22 @@ let config = {
       }]
     }
   }
+};
+
+const dataTableSettings = {
+  columnDefs: [{
+    className: "text-center",
+    targets: [0, 1]
+  }],
+  dom: "<'row'<'col-md-6 text-left'l><'col-md-6'f>>" +
+    "<'row'<'col-md-12't>>" +
+    "<'row'<'col-md-12 pb-2'i><'col-md-12 center-pagination'p>>",
+  aLengthMenu: [
+    [10, 25, 50, 75, -1],
+    [10, 25, 50, 75, "All"]
+  ],
+  iDisplayLength: 25,
+  responsive: true
 };
 
 //Take an array and output an array with groups matching a string (sliced value)
@@ -129,9 +180,9 @@ const addStatus = async (chartEle, statusArray, groupType) => {
   }
 
   //Set the visuals to the appropriate format
-  config.type = graphType;
-  config.options.scales.xAxes[0].time.parser = timeFormat;
-  config.options.scales.xAxes[0].time.tooltipFormat = tooltipFormat;
+  chartConfig.type = graphType;
+  chartConfig.options.scales.xAxes[0].time.parser = timeFormat;
+  chartConfig.options.scales.xAxes[0].time.tooltipFormat = tooltipFormat;
 
   //Empty the graph
   chartEle.data.labels = [];
@@ -166,7 +217,7 @@ const addStatus = async (chartEle, statusArray, groupType) => {
     }
   }
   //Update the graph to show the result
-  chartEle.update(config);
+  chartEle.update(chartConfig);
 };
 
 
@@ -213,10 +264,11 @@ const buttonAnimation = (ele, text, animationBool) =>
 
 //Start the script
 window.onload = () => {
-  const chartEle = new Chart(
+  chartEle = new Chart(
     document.getElementById('line-chart').getContext('2d'),
-    config
+    chartConfig
   );
   loadData(chartEle, "month");
   setButtonsEvent(chartEle);
+  dataTable = $("#eventsTable").DataTable(dataTableSettings);
 };
