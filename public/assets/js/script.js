@@ -19,11 +19,25 @@ let dataTable;
 let dataContainer;
 
 //Show/hide the table
-const tableVisible = visibleBool =>
-  document.getElementById("eventsTableDiv").style.display = visibleBool ? "block" : "none";
+const tableVisible = visibleBool => {
+  const button = document.getElementById("toggleTable");
+  const eventsTableDiv = document.getElementById("eventsTableDiv");
+  if (!visibleBool) { //toggle state 
+    if (button.innerText === "Show table") {
+      button.innerText = "Hide table";
+      eventsTableDiv.style.display = "block";
+    } else {
+      button.innerText = "Show table";
+      eventsTableDiv.style.display = "none";
+    }
+  } else {
+    eventsTableDiv.style.display = visibleBool ? "block" : "none";
+    button.innerText = visibleBool ? "Hide table" : "Show table";
+  }
+};
 
-//Add lines to a dataTable
-const addTableLines = (dataTable, dataArray) => dataTable.rows.add(dataArray).draw();
+//Add lines to a dataTable (you still need to call dataTable.draw())
+const addTableLines = (dataTable, dataArray) => dataTable.rows.add(dataArray);
 
 //Remove all the lines from a table
 const clearTable = dataTable => dataTable.clear();
@@ -36,16 +50,15 @@ const updateTable = (event, array) => {
   const clickedDataGroup = chartEle.data.labels[clickedBar];
   //Get the data corresponding with the bar
   const correspondingData = [];
-  console.log("avant")
   dataContainer.forEach(day => day.date.includes(clickedDataGroup) && correspondingData.push(day));
   clearTable(dataTable); //Empty the table
   //Add the lines to the table
   correspondingData.forEach(day => {
     const newLines = [];
-    day.events.forEach(event => newLines.push([event.timestamp, event.type, event.msg]));
+    day.events.forEach(event => newLines.push([moment(event.timestamp).format('YYYY-MM-DD HH:mm'), event.type, event.msg]));
     addTableLines(dataTable, newLines);
   });
-  console.log("apres")
+  dataTable.draw();
   tableVisible(true);
 };
 
@@ -76,6 +89,7 @@ let chartConfig = {
   },
   options: {
     responsive: true,
+    maintainAspectRatio: false,
     title: {
       display: false,
       text: 'GitHub Status Tracker'
@@ -125,6 +139,12 @@ let chartConfig = {
 const dataTableSettings = {
   columnDefs: [{
     className: "text-center",
+    targets: [0, 1]
+  }, {
+    className: "text-left",
+    targets: [2]
+  }, {
+    width: 200,
     targets: [0, 1]
   }],
   dom: "<'row'<'col-md-6 text-left'l><'col-md-6'f>>" +
@@ -248,10 +268,19 @@ const updateData = (chartEle, groupMethod) => {
 };
 
 //Set button events
-const setButtonsEvent = chartEle => {
+const setButtonsEvent = (chartEle, dataTable) => {
   ["day", "month", "year"].forEach(button =>
     document.getElementById(button).addEventListener('click', () => loadData(chartEle, button)));
+
   document.getElementById("updateData").addEventListener('click', () => updateData(chartEle, "month"));
+  document.getElementById("toggleTable").addEventListener('click', () => tableVisible());
+
+  ["filterGood", "filterMinor", "filterMajor"].forEach(button =>
+    document.getElementById(button).addEventListener('click', () =>
+      dataTable.column(1).search(button.replace('filter', ''), true, false).draw()));
+
+  document.getElementById("filterReset").addEventListener('click', () =>
+    dataTable.column(1).search('', true, false).draw());
 };
 
 //Remove html chars from string
@@ -264,11 +293,8 @@ const buttonAnimation = (ele, text, animationBool) =>
 
 //Start the script
 window.onload = () => {
-  chartEle = new Chart(
-    document.getElementById('line-chart').getContext('2d'),
-    chartConfig
-  );
+  chartEle = new Chart(document.getElementById('line-chart').getContext('2d'), chartConfig);
   loadData(chartEle, "month");
-  setButtonsEvent(chartEle);
   dataTable = $("#eventsTable").DataTable(dataTableSettings);
+  setButtonsEvent(chartEle, dataTable);
 };

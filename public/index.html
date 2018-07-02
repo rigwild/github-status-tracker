@@ -20,18 +20,30 @@
             Github Status Tracker
           </div>
           <div class="card-body">
-            <canvas id="line-chart"></canvas>
+            <canvas id="line-chart" height="600"></canvas>
           </div>
           <div class="card-footer">
             <div class="btn-group" role="group">
-              <button type="button" class="btn btn-secondary" id="day">Group by day</button>
-              <button type="button" class="btn btn-secondary" id="month">Group by month</button>
-              <button type="button" class="btn btn-secondary" id="year">Group by year</button>
+              <button type="button" class="btn btn-dark" id="day">Group by day</button>
+              <button type="button" class="btn btn-dark" id="month">Group by month</button>
+              <button type="button" class="btn btn-dark" id="year">Group by year</button>
             </div>
 
             <button type="button" class="btn btn-primary" id="updateData">Update graph data</button>
           </div>
+          <div class="p-3">
+            <button type="button" class="btn btn-primary" id="toggleTable">Show table</button>
+          </div>
           <div class="card-body table-responsive" id="eventsTableDiv">
+
+            <label>Filter : </label>
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-success" id="filterGood">Good</button>
+              <button type="button" class="btn btn-warning" style="color:white" id="filterMinor">Minor</button>
+              <button type="button" class="btn btn-danger" id="filterMajor">Major</button>
+              <button type="button" class="btn btn-secondary" id="filterReset">Reset</button>
+            </div>
+
             <table class="table table-sm data-table table-hover table-striped width100" id="eventsTable">
               <thead>
                 <tr>
@@ -45,7 +57,6 @@
             </table>
           </div>
         </div>
-        
       </div>
     </div>
   </div>
