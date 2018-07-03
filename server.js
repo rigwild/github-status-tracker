@@ -35,4 +35,4 @@ app.get('/updateData', (req, res) => {
     .catch(err => console.error(err));
 });
 
-app.listen(8080, () => console.log('Server is listening on port 8080.'));
+app.listen(8080, () => console.log('Server is listening on 127.0.0.1:8080.'));

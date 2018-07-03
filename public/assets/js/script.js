@@ -71,37 +71,25 @@ let chartConfig = {
       label: 'Good',
       backgroundColor: Chart.helpers.color(colors.green).alpha(0.5).rgbString(),
       borderColor: colors.green,
-      fill: false,
       data: []
     }, {
       label: 'Minor',
       backgroundColor: Chart.helpers.color(colors.orange).alpha(0.5).rgbString(),
       borderColor: colors.orange,
-      fill: false,
       data: []
     }, {
       label: 'Major',
       backgroundColor: Chart.helpers.color(colors.red).alpha(0.5).rgbString(),
       borderColor: colors.red,
-      fill: false,
       data: []
     }]
   },
   options: {
     responsive: true,
     maintainAspectRatio: false,
-    title: {
-      display: false,
-      text: 'GitHub Status Tracker'
-    },
-    tooltips: {
-      mode: 'index',
-      intersect: false
-    },
-    hover: {
-      mode: 'nearest',
-      intersect: true
-    },
+    title: { display: false, text: 'GitHub Status Tracker' },
+    tooltips: { mode: 'index', intersect: false },
+    hover: { mode: 'nearest', intersect: true },
     onClick: updateTable,
     scales: {
       xAxes: [{
