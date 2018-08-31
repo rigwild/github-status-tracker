@@ -9,20 +9,24 @@ It is a node.js server script. It contains a scrapper which loop through all the
 The client fetches the data from the server and it parses it. You can sort by year, month or day. You can hide a type of event by clicking on its graph's legend.
 
 You can view the events related to a period by clicking on its bar on the chart. A table appears showing : The dates, the messages and the type of the events. This table can be filtered by the type of event (Good/Minor/Major) and sorted/searchable thanks to DataTable.
+
 ## Install
 To install this app, you need to download the content of the repository and install the needed dependencies through these commands :
 
-    $ git clone https://github.com/rigwild/github-status-tracker
-    $ npm install
-You are done ! To start the script just run this :
+    git clone https://github.com/rigwild/github-status-tracker
+    npm install
 
-    $ npm start
+You are done ! To start the script just run :
+
+    npm start
 
 And navigate to http://127.0.0.1:8080/.
-## Demo
-A working demo is available here : [https://github-status-tracker.now.sh/](https://github-status-tracker.now.sh/)
 
-![demo](https://github.asauvage.fr/img/other/github-status-tracker.gif)
+## Demo
+A working demo is available here : [https://github-status-tracker.asauvage.fr/](https://github-status-tracker.asauvage.fr/)
+
+![demo](github-status-tracker.gif)
+
 ## License
 
 This project is licensed under the [MIT](https://github.com/rigwild/github-status-tracker/blob/master/LICENSE) license.
