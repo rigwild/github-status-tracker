@@ -1,9 +1,11 @@
 # github-status-tracker
 
 ## /!\ Notice /!\
-Github has deprecated [https://status.github.com/](https://status.github.com/). I will keep the website up, status updates will continue to be fetched until GitHub disable their system. I don't have the time to maintain this repository.
+**Github has deprecated [https://status.github.com/](https://status.github.com/). The new version is not compatible with this.**
 
-New statuses updates can be found here : [https://www.githubstatus.com/](https://www.githubstatus.com/)
+**This is no longer working and I don't want to update it.**
+
+**New statuses updates can be found here : [https://www.githubstatus.com/](https://www.githubstatus.com/)**
 
 ____
 
